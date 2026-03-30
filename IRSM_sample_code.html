@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IRSM Dashboard — Sample Code</title>
+<style>
+  /* ── Core color variables ── */
+  :root {
+    --bg:      #050d12;
+    --surface: #0a1a24;
+    --border:  #1a3040;
+    --text:    #d4eaf5;
+    --muted:   #5a8099;
+    --accent:  #00c9a7;
+    --warn:    #ff8c42;
+    --danger:  #ff4f6e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    padding: 32px;
+    width: 900px;
+  }
+
+  /* ── Page title ── */
+  h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .subtitle { font-size: 12px; color: var(--muted); margin-bottom: 32px; }
+
+  /* ── Three-layer flow ── */
+  .layer { margin-bottom: 24px; }
+  .layer-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ── Input cards side by side ── */
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .card-title { font-size: 11px; color: var(--accent); margin-bottom: 12px; }
+
+  /* ── Single pathway row ── */
+  .pathway {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 6px;
+    font-size: 11px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Process score cards ── */
+  .process-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  .process-card {
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 11px;
+  }
+  .pc-inflam { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.3); }
+  .pc-injury  { background: rgba(247,183,49,0.08);  border: 1px solid rgba(247,183,49,0.3);  }
+  .pc-fibrosis{ background: rgba(253,150,68,0.08);  border: 1px solid rgba(253,150,68,0.3);  }
+  .pc-title   { font-size: 10px; font-weight: bold; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .pc-eq      { font-size: 9px; color: var(--accent); margin-bottom: 10px; }
+
+  /* ── Progress bar ── */
+  .bar-label  { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-bottom: 3px; }
+  .bar-track  { height: 5px; background: rgba(255,255,255,0.07); border-radius: 99px; margin-bottom: 8px; overflow: hidden; }
+  .bar-fill   { height: 100%; border-radius: 99px; }
+
+  /* ── Output row ── */
+  .output-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  .output-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .oc-title   { font-size: 10px; color: var(--muted); letter-spacing: 0.12em; margin-bottom: 10px; }
+  .risk-score { font-size: 48px; font-weight: bold; color: var(--warn); line-height: 1; }
+  .risk-label { font-size: 10px; color: var(--warn); margin-top: 4px; }
+  .risk-sub   { font-size: 9px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Connector arrow ── */
+  .connector {
+    display: flex; justify-content: center;
+    align-items: center; height: 28px; margin: 4px 0;
+  }
+  .arrow-down {
+    width: 0; height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 9px solid var(--accent);
+    opacity: 0.5;
+  }
+
+  /* ── Equation strip ── */
+  .eq-strip {
+    background: rgba(0,201,167,0.04);
+    border: 1px solid rgba(0,201,167,0.15);
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 11px;
+    color: var(--accent);
+    text-align: center;
+    margin: 4px 0;
+  }
+  .eq-label { font-size: 9px; color: var(--muted); margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+  <h1>Immune Risk Scoring Module</h1>
+  <p class="subtitle">Sample code — core dashboard structure &nbsp;|&nbsp; Biomedical Product Design, Team 13</p>
+
+  <!-- ══ LAYER 1: INPUTS ══════════════════════════════════════════════════ -->
+  <div class="layer">
+    <div class="layer-label">Layer 1 · Inputs — bₖⱼ ∈ [0,1]</div>
+    <div class="input-row">
+
+      <!-- Biomarker panel -->
+      <div class="card">
+        <div class="card-title">PATHWAY-ORGANIZED BIOMARKER PANEL</div>
+
+        <div class="pathway">
+          <div class="dot" style="background:#ff6b6b"></div>
+          <span style="flex:1">Innate Inflammation</span>
+          <span style="color:#5a8099;font-size:10px">IL-6 · CRP · TNF-α</span>
+        </div>
+
+        <div class="pathway">
+          <div class="dot" style="background:#f7b731"></div>
+          <span style="flex:1">Complement</span>
+          <span style="color:#5a8099;font-size:10px">C3a · C5b-9</span>
+        </div>
+
+        <div class="pathway">
+          <div class="dot" style="background:#45aaf2"></div>
+          <span style="flex:1">T-Cell Activation</span>
+          <span style="color:#5a8099;font-size:10px">IFN-γ · Granzyme B · IL-17</span>
+        </div>
+
+        <div class="pathway">
+          <div class="dot" style="background:#a29bfe"></div>
+          <span style="flex:1">Antibody / Fc</span>
+          <span style="color:#5a8099;font-size:10px">DSA · IgG</span>
+        </div>
+
+        <div class="pathway">
+          <div class="dot" style="background:#fd9644"></div>
+          <span style="flex:1">Fibrosis Remodeling</span>
+          <span style="color:#5a8099;font-size:10px">TGF-β · MMP-2 · CTGF</span>
+        </div>
+      </div>
+
+      <!-- Patient context -->
+      <div class="card">
+        <div class="card-title">PATIENT / IMPLANT CONTEXT (mₗ · cₗ)</div>
+
+        <!-- Context items use a simple 2-column grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+
+          <div style="padding:8px;border-radius:6px;background:rgba(255,255,255,0.03)">
+            <div style="font-size:9px;color:var(--muted)">HLA MISMATCH</div>
+            <div style="font-size:12px;font-weight:bold">3 antigens</div>
+            <div style="font-size:9px;color:var(--accent)">cₗ·mₗ = +0.070</div>
+          </div>
+
+          <div style="padding:8px;border-radius:6px;background:rgba(255,255,255,0.03)">
+            <div style="font-size:9px;color:var(--muted)">IMMUNOSUPPRESSION</div>
+            <div style="font-size:12px;font-weight:bold">Low</div>
+            <div style="font-size:9px;color:var(--accent)">cₗ·mₗ = +0.060</div>
+          </div>
+
+          <div style="padding:8px;border-radius:6px;background:rgba(255,255,255,0.03)">
+            <div style="font-size:9px;color:var(--muted)">BIOPSY GRADE</div>
+            <div style="font-size:12px;font-weight:bold">Borderline</div>
+            <div style="font-size:9px;color:var(--accent)">cₗ·mₗ = +0.040</div>
+          </div>
+
+          <div style="padding:8px;border-radius:6px;background:rgba(255,255,255,0.03)">
+            <div style="font-size:9px;color:var(--muted)">IMPLANT AGE</div>
+            <div style="font-size:12px;font-weight:bold">18 months</div>
+            <div style="font-size:9px;color:var(--accent)">cₗ·mₗ = +0.054</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- end input-row -->
+  </div><!-- end layer 1 -->
+
+  <!-- Equation strip: Tier 1 -->
+  <div class="eq-strip">
+    <div class="eq-label">TIER 1 GOVERNING EQUATION — PATHWAY SCORE</div>
+    Pₖ = Σⱼ (wₖⱼ · bₖⱼ) &nbsp;|&nbsp; Σⱼ wₖⱼ = 1 &nbsp;|&nbsp; Pₖ ∈ [0,1] &nbsp;|&nbsp; Activated if Pₖ ≥ 0.40
+  </div>
+
+  <div class="connector"><div class="arrow-down"></div></div>
+
+  <!-- ══ LAYER 2: PROCESS ESTIMATION ══════════════════════════════════════ -->
+  <div class="layer">
+    <div class="layer-label">Layer 2 · Biological Process Estimation — Qᵢ = Σₖ∈ᵢ (vᵢₖ · Pₖ)</div>
+    <div class="process-row">
+
+      <div class="process-card pc-inflam">
+        <div class="pc-title" style="color:#ff6b6b">INFLAMMATION SCORE</div>
+        <div class="pc-eq">Q = v₁·P_innate + v₂·P_complement</div>
+        <div class="bar-label"><span>Innate (v₁=0.60)</span><span>72%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:72%;background:#ff6b6b"></div></div>
+        <div class="bar-label"><span>Complement (v₂=0.40)</span><span>55%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:55%;background:#ff6b6b"></div></div>
+      </div>
+
+      <div class="process-card pc-injury">
+        <div class="pc-title" style="color:#f7b731">TISSUE INJURY SCORE</div>
+        <div class="pc-eq">Q = v₃·P_tcell + v₄·P_antibody</div>
+        <div class="bar-label"><span>T-cell (v₃=0.55)</span><span>61%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:61%;background:#f7b731"></div></div>
+        <div class="bar-label"><span>Ab-mediated (v₄=0.45)</span><span>44%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:44%;background:#f7b731"></div></div>
+      </div>
+
+      <div class="process-card pc-fibrosis">
+        <div class="pc-title" style="color:#fd9644">FIBROSIS SCORE</div>
+        <div class="pc-eq">Q = v₅·P_remodel + v₆·P_ecm</div>
+        <div class="bar-label"><span>Remodeling (v₅=0.60)</span><span>38%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:38%;background:#fd9644"></div></div>
+        <div class="bar-label"><span>ECM deposition (v₆=0.40)</span><span>29%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:29%;background:#fd9644"></div></div>
+      </div>
+
+    </div><!-- end process-row -->
+  </div><!-- end layer 2 -->
+
+  <!-- Equation strip: Tier 2 & 3 -->
+  <div class="eq-strip">
+    <div class="eq-label">TIER 2 & 3 GOVERNING EQUATIONS — AGGREGATE + CONTEXT ADJUSTMENT</div>
+    S = 0.40·Q_inflam + 0.40·Q_injury + 0.20·Q_fibrosis &nbsp;|&nbsp;
+    S_adj = clip(S + Σₗ(cₗ·mₗ), 0, 1) &nbsp;|&nbsp; RRS = S_adj × 100
+  </div>
+
+  <div class="connector"><div class="arrow-down"></div></div>
+
+  <!-- ══ LAYER 3: CLINICAL OUTPUT ══════════════════════════════════════════ -->
+  <div class="layer">
+    <div class="layer-label">Layer 3 · Clinical Output — P(rejection) = 1 / (1 + e^(−α(S_adj − θ)))</div>
+    <div class="output-row">
+
+      <!-- Risk score -->
+      <div class="output-card">
+        <div class="oc-title">REJECTION RISK SCORE</div>
+        <div class="risk-score">67</div>
+        <div class="risk-label">Moderate–High</div>
+        <div class="risk-sub">0–100 scale · pathway-anchored</div>
+        <div style="margin-top:10px;font-size:9px;color:var(--accent)">
+          P(rejection) = 0.569
+        </div>
+      </div>
+
+      <!-- Rejection process profile -->
+      <div class="output-card">
+        <div class="oc-title">REJECTION PROCESS PROFILE</div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px">
+          <span style="color:#ff6b6b;width:90px">Inflammation</span>
+          <div style="flex:1;height:4px;background:#ff6b6b;opacity:0.5;border-radius:99px"></div>
+          <span style="font-size:10px;color:var(--muted)">72%</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px">
+          <span style="color:#45aaf2;width:90px">T-cell Injury</span>
+          <div style="flex:1;height:4px;background:#45aaf2;opacity:0.5;border-radius:99px"></div>
+          <span style="font-size:10px;color:var(--muted)">61%</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px">
+          <span style="color:#a29bfe;width:90px">Ab-mediated</span>
+          <div style="flex:1;height:4px;background:#a29bfe;opacity:0.5;border-radius:99px"></div>
+          <span style="font-size:10px;color:var(--muted)">44%</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px">
+          <span style="color:#fd9644;width:90px">Fibrosis</span>
+          <div style="flex:1;height:4px;background:#fd9644;opacity:0.5;border-radius:99px"></div>
+          <span style="font-size:10px;color:var(--muted)">33%</span>
+        </div>
+
+      </div>
+
+      <!-- Clinical actions -->
+      <div class="output-card">
+        <div class="oc-title">SUGGESTED CLINICAL ACTIONS</div>
+
+        <div style="display:flex;gap:8px;font-size:11px;line-height:1.5;margin-bottom:7px">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0"></div>
+          Escalate anti-inflammatory protocol — innate pathway dominant
+        </div>
+
+        <div style="display:flex;gap:8px;font-size:11px;line-height:1.5;margin-bottom:7px">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0"></div>
+          Monitor T-cell markers at 4-week interval
+        </div>
+
+        <div style="display:flex;gap:8px;font-size:11px;line-height:1.5;margin-bottom:7px">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0"></div>
+          DSA trending — consider HLA typing review
+        </div>
+
+        <div style="display:flex;gap:8px;font-size:11px;line-height:1.5">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0"></div>
+          Fibrosis low — no anti-fibrotic adjustment yet
+        </div>
+
+      </div>
+
+    </div><!-- end output-row -->
+  </div><!-- end layer 3 -->
+
+</body>
+</html>
